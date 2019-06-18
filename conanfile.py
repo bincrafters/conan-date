@@ -20,8 +20,9 @@ class DateConan(ConanFile):
     generators = "cmake"
     settings = "os", "arch", "compiler", "build_type"
     options = {"shared": [True, False], "fPIC": [True, False], "use_system_tz_db": [True, False],
-               "use_tz_db_in_dot": [True, False]}
-    default_options = {"shared": False, "fPIC": True, "use_system_tz_db": True, "use_tz_db_in_dot": False}
+               "use_tz_db_in_dot": [True, False], "disable_string_view": [True, False]}
+    default_options = {"shared": False, "fPIC": True, "use_system_tz_db": True,
+                       "use_tz_db_in_dot": False, "disable_string_view": False}
     _source_subfolder = "source_subfolder"
     _build_subfolder = "build_subfolder"
 
@@ -57,6 +58,7 @@ class DateConan(ConanFile):
     def _configure_cmake(self):
         cmake = CMake(self)
         cmake.definitions["ENABLE_DATE_TESTING"] = False
+        cmake.definitions["DISABLE_STRING_VIEW"] = self.options.disable_string_view
         if self.settings.os == "Windows":
             cmake.definitions["USE_TZ_DB_IN_DOT"] = False
             cmake.definitions["USE_SYSTEM_TZ_DB"] = False
