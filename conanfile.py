@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from conans import ConanFile, CMake, tools
+from conans.errors import ConanInvalidConfiguration
 import os
 
 
@@ -18,8 +19,8 @@ class DateConan(ConanFile):
     generators = "cmake"
     settings = "os", "arch", "compiler", "build_type"
     options = {"shared": [True, False], "fPIC": [True, False], "use_system_tz_db": [True, False], "use_tz_db_in_dot": [True, False]}
-    default_options = ("shared=False", "fPIC=True", "use_system_tz_db=True", "use_tz_db_in_dot=False")
-    source_subfolder = "source_folder"
+    default_options = {'shared': False, 'fPIC': True, 'use_system_tz_db': True, 'use_tz_db_in_dot': False}
+    _source_subfolder = "source_folder"
     build_folder = "build_folder"
 
     def config_options(self):
@@ -29,7 +30,7 @@ class DateConan(ConanFile):
     def configure(self):
         # FIXME: It's not working on Windows
         if self.settings.os == "Windows":
-            raise Exception("Date is not working on Windows yet.")
+            raise ConanInvalidConfiguration("Date is not working on Windows yet.")
 
     def requirements(self):
         if not self.options.use_system_tz_db:
@@ -38,9 +39,9 @@ class DateConan(ConanFile):
     def source(self):
         tools.get("{0}/archive/v{1}.tar.gz".format(self.homepage, self.version))
         extracted_dir = self.name + "-" + self.version
-        os.rename(extracted_dir, self.source_subfolder)
+        os.rename(extracted_dir, self._source_subfolder)
 
-    def configure_cmake(self):
+    def _configure_cmake(self):
         cmake = CMake(self)
         cmake.definitions["ENABLE_DATE_TESTING"] = False
         cmake.definitions["USE_SYSTEM_TZ_DB"] = self.options.use_system_tz_db
@@ -49,12 +50,12 @@ class DateConan(ConanFile):
         return cmake
 
     def build(self):
-        cmake = self.configure_cmake()
+        cmake = self._configure_cmake()
         cmake.build()
 
     def package(self):
-        self.copy(pattern="LICENSE.txt", dst="licenses", src=self.source_subfolder)
-        cmake = self.configure_cmake()
+        self.copy(pattern="LICENSE.txt", dst="licenses", src=self._source_subfolder)
+        cmake = self._configure_cmake()
         cmake.install()
 
     def package_info(self):
