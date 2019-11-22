@@ -8,7 +8,6 @@ class DateConan(ConanFile):
     version = "2.4.1"
     url = "https://github.com/bincrafters/conan-date"
     homepage = "https://github.com/HowardHinnant/date"
-    author = "Bincrafters <bincrafters@gmail.com>"
     description = "A date and time library based on the C++11/14/17 <chrono> header"
     license = "MIT"
     exports = ["LICENSE.md"]
